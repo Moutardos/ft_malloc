@@ -2,30 +2,45 @@ HOSTTYPE ?= $(shell uname -m)_$(shell uname -s)
 NAME = libft_malloc_$(HOSTTYPE).so
 LINKNAME = libft_malloc.so
 
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror
+LIBS_DIR = libs
+LIBFT = $(LIBS_DIR)/42_libft
+LIBFT_A = $(LIBFT)/libft.a
 
-SRC_DIR = src/
+SRC_DIR = src
 SRC_FILES = malloc.c free.c realloc.c
-SRCS = $(addprefix $(SRC_DIR), $(SRC_FILES))
-OBJ_DIR = obj/
-OBJS = $(addprefix $(OBJ_DIR), $(SRC_FILES:.c=.o))
 
-all: $(NAME)
+OBJ_DIR = obj
+OBJS = $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.c=.o))
 
-$(NAME): $(OBJS)
-	$(CC) -shared -o $(NAME) $(OBJ)
-	# Create or update the symbolic link
-	ln -sf $(NAME) $(LINKNAME)
+INCLUDE_DIR = include
+BIN_DIR = bin
 
-%.o: %.c
+CC = gcc
+CFLAGS = -Wall -Wextra -MMD -MP -I$(INCLUDE_DIR)
+
+all: $(BIN_DIR)/$(NAME)
+
+$(LIBFT_A):
+	$(MAKE) -C $(LIBFT)
+
+$(BIN_DIR)/$(NAME): $(LIBFT_A) $(OBJS) | $(BIN_DIR)
+	$(CC) -shared -o $@ $(OBJS) $(LIBFT_A)
+	ln -sf $(BIN_DIR)/$(NAME) $(LINKNAME)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJ_DIR) $(BIN_DIR):
+	mkdir -p $@
+
 clean:
-	rm -f $(OBJ)
+	rm -rf $(OBJ_DIR)
+	$(MAKE) -C $(LIBFT) clean
 
 fclean: clean
-	rm -f $(NAME) $(LINKNAME)
+	rm -rf $(BIN_DIR)
+	rm -f $(LINKNAME)
+	$(MAKE) -C $(LIBFT) fclean
 
 re: fclean all
 

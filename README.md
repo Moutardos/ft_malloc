@@ -75,8 +75,8 @@ Total : 52698 bytes
 ### HOW
 
 Main idea: mmap give us a big zone of "memory" to play with,
-we divided it inside by *block* of different size (tiny small large)
-LARGE should be it's own thing. idk yet lol
+we divided it inside by *zone* that define the size of our memory *block*
+
 
 ### What is a page?
 What they mean by pages (sys_conf) is the way memory is divided logicaly (opposed to physically) for the process.
