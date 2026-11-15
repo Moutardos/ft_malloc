@@ -7,7 +7,7 @@ LIBFT = $(LIBS_DIR)/42_libft
 LIBFT_A = $(LIBFT)/libft.a
 
 SRC_DIR = src
-SRC_FILES = malloc.c free.c realloc.c
+SRC_FILES = malloc.c free.c realloc.c memory_zones.c
 
 OBJ_DIR = obj
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.c=.o))
@@ -16,7 +16,7 @@ INCLUDE_DIR = include
 BIN_DIR = bin
 
 CC = gcc
-CFLAGS = -Wall -Wextra -MMD -MP -I$(INCLUDE_DIR)
+CFLAGS = -Wall -Wextra -MMD -MP -fPIC -I$(INCLUDE_DIR)
 
 all: $(BIN_DIR)/$(NAME)
 
