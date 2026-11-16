@@ -1,4 +1,4 @@
-#include "memory_zones.h"
+#include "engine/memory_zones.h"
 
 #include "sys/resource.h"
 #include "sys/mman.h"
@@ -9,6 +9,8 @@ static int init_malloc()
 {
 	g_malloc.page_size = sysconf(_SC_PAGESIZE);
 	g_malloc.is_init = 1;
+	// TODO: check when to return an error (sysconf ?)
+	return 1;
 }
 
 static t_zonetype mem_to_zonetype(size_t mem)
@@ -39,6 +41,7 @@ static size_t block_max_alloc(t_zonetype zone_type)
 		return limit.rlim_cur;
 	}
 }
+
 // TODO: see if use int for errors
 static t_zone_header *find_zone(size_t mem)
 {
@@ -84,5 +87,6 @@ void *allocate_block(size_t mem_asked)
 	if (zone_ptr == NULL)
 	{
 		// ERR
+		return NULL;
 	}
 }

@@ -1,23 +1,40 @@
-HOSTTYPE ?= $(shell uname -m)_$(shell uname -s)
-NAME = libft_malloc_$(HOSTTYPE).so
-LINKNAME = libft_malloc.so
+# VARS
 
-LIBS_DIR = libs
-LIBFT = $(LIBS_DIR)/42_libft
-LIBFT_A = $(LIBFT)/libft.a
+HOSTTYPE	?=	$(shell uname -m)_$(shell uname -s)
+NAME 		=	libft_malloc_$(HOSTTYPE).so
+LINKNAME	=	libft_malloc.so
 
-SRC_DIR = src
-SRC_FILES = malloc.c free.c realloc.c memory_zones.c
+LIBS_DIR	=	libs
+LIBFT		=	$(LIBS_DIR)/42_libft
+LIBFT_A		=	$(LIBFT)/libft.a
 
-OBJ_DIR = obj
-OBJS = $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.c=.o))
+SRC_DIR 	:=	src
 
-INCLUDE_DIR = include
-BIN_DIR = bin
+SRCS_ENGINE :=	\
+				memory_zones.c \
+				memory_blocks.c
 
-CC = gcc
-CFLAGS = -Wall -Wextra -MMD -MP -fPIC -I$(INCLUDE_DIR)
+SRCS_MALLOC	:=	\
+				malloc.c \
+				free.c \
+				realloc.c
 
+SRCS		:=	\
+				${addprefix engine/, $(SRCS_ENGINE)} \
+				${addprefix malloc/, $(SRCS_MALLOC)}
+
+SRCS 		:=	${addprefix $(SRC_DIR), $(SRCS)}  
+
+OBJ_DIR		:=	obj
+OBJS		:=	${addprefix $(OBJ_DIR)/, $(SRC_FILES:.c=.o)}
+
+INCLUDE_DIR	:=	include
+BIN_DIR		:=	bin
+
+CC			:= gcc
+CFLAGS		:= -Wall -Wextra -MMD -MP -fPIC -I$(INCLUDE_DIR)
+
+# RULES
 all: $(BIN_DIR)/$(NAME)
 
 $(LIBFT_A):

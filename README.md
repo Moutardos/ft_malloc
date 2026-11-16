@@ -1,7 +1,3 @@
-# FT_MALLOC
-
-42 introduction to memory allocation,
-create a lib that'll contain my version of malloc
 
 ## Instructions
 
@@ -21,7 +17,7 @@ one global variable is allowed to manage allocations / thread safety
 
 ## Mandatory
 
-### Lib Functions
+### Lib Functions (API)
 ```c
 // deallocate memory pointed by ptr
 void    free(void *ptr);
@@ -36,6 +32,7 @@ void    *malloc(size_t size);
 void    *realloc(void *ptr, size_t size);
 ```
 
+### Memory zones (engine)
 mmap and munmap system calls to request memory zones of the system
 *Perfomance*: Limit the number of calls to mmap and munmap.
 
@@ -68,29 +65,4 @@ Total : 52698 bytes
 - Multi thread
 - Use env variable (see system-malloc)
 - Defragment freed memory
-
-
-## Learning
-
-### HOW
-
-Main idea: mmap give us a big zone of "memory" to play with,
-we divided it inside by *zone* that define the size of our memory *block*
-
-
-### What is a page?
-What they mean by pages (sys_conf) is the way memory is divided logicaly (opposed to physically) for the process.
-Logical -> pages
-Physical -> frames
-To give the process enough space that's next to each other, even if it's not the case physically.
-
-Block allocation should be always to the closest biggest multiple of  pagesize
-
-### Header:
-Header before block:
-- can give the size
-- if it's already free or not.
-Header before zone (given by mmap):
-- pointer to next zone
-- type of zone (tiny/small/large)
-o
+- `show_alloc_mem_ex`: extended visualizer with allocation memory and memdump

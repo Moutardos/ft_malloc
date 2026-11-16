@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unistd.h>
+#include "memory_block.h"
 
 // Minimum of allocation possible in a zone
 #define NB_ALLOC 100
@@ -28,15 +29,6 @@ typedef struct s_zone_header
 	size_t				  free_space;
 	struct s_zone_header *next;
 } t_zone_header;
-
-// Header for the memory block
-typedef struct s_block_header
-{
-	size_t				   block_size;
-	int					   is_free;
-	t_zone_header		   zone_header;
-	struct s_block_header *next;
-} t_block_header;
 
 // Singleton containing information like the
 // starting memoryzone node or thread context
