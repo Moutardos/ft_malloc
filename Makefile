@@ -12,7 +12,7 @@ SRC_DIR 	:=	src
 
 SRCS_ENGINE :=	\
 				memory_zones.c \
-				memory_blocks.c
+				memory_block.c
 
 SRCS_MALLOC	:=	\
 				malloc.c \
@@ -23,10 +23,11 @@ SRCS		:=	\
 				${addprefix engine/, $(SRCS_ENGINE)} \
 				${addprefix malloc/, $(SRCS_MALLOC)}
 
-SRCS 		:=	${addprefix $(SRC_DIR), $(SRCS)}  
-
 OBJ_DIR		:=	obj
-OBJS		:=	${addprefix $(OBJ_DIR)/, $(SRC_FILES:.c=.o)}
+OBJS		:=	${addprefix $(OBJ_DIR)/, $(SRCS:.c=.o)}
+
+SRCS 		:=	${addprefix $(SRC_DIR)/, $(SRCS)}  
+
 
 INCLUDE_DIR	:=	include
 BIN_DIR		:=	bin
@@ -40,15 +41,15 @@ all: $(BIN_DIR)/$(NAME)
 $(LIBFT_A):
 	$(MAKE) -C $(LIBFT)
 
-$(BIN_DIR)/$(NAME): $(LIBFT_A) $(OBJS) | $(BIN_DIR)
+$(BIN_DIR)/$(NAME): $(LIBFT_A) $(OBJS)
+	mkdir -p ${@D}
 	$(CC) -shared -o $@ $(OBJS) $(LIBFT_A)
 	ln -sf $(BIN_DIR)/$(NAME) $(LINKNAME)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	mkdir -p ${@D}
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJ_DIR) $(BIN_DIR):
-	mkdir -p $@
 
 clean:
 	rm -rf $(OBJ_DIR)
