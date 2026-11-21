@@ -41,5 +41,5 @@ void show_alloc_mem()
 		print_zone(zone);
 		zone = zone->next;
 	}
-	printf("Total : %lu bytes", total_malloc);
+	printf("Total : %lu bytes\n", total_malloc);
 }
