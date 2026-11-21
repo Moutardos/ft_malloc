@@ -5,8 +5,7 @@
 
 t_malloc_singleton g_malloc = {0};
 
-static int init_malloc()
-{
+static int init_malloc() {
 	g_malloc.page_size = sysconf(_SC_PAGESIZE);
 	g_malloc.is_init = 1;
 	// TODO: check when to return an error (sysconf ?)
@@ -35,10 +34,14 @@ static size_t block_max_alloc(t_zonetype zone_type)
 	case SMALL:
 		return SMALL_MAX_ALLOC;
 	default:
+	#ifdef __linux__
 		struct rlimit limit;
 		// return soft limit
 		getrlimit(RLIMIT_AS, &limit);
 		return limit.rlim_cur;
+	#endif
+		// TODO: TREAT MAC
+		return 100000;
 	}
 }
 
@@ -48,8 +51,7 @@ static t_zone_header *find_zone(size_t mem)
 	t_zonetype	   type = mem_to_zonetype(mem);
 	t_zone_header *zone_ptr = g_malloc.start;
 
-	// Look for the correct zone header until it's found
-	while (zone_ptr != NULL && zone_ptr->zone_type != type)
+	// Look for the correct zone header until it's found while (zone_ptr != NULL && zone_ptr->zone_type != type)
 	{
 		zone_ptr = zone_ptr->next;
 	}
@@ -76,9 +78,14 @@ static t_zone_header *find_zone(size_t mem)
 	return zone_ptr;
 }
 
-void *allocate_block(size_t mem_asked)
+void *allocate_memory(size_t mem_asked)
 {
-	void *zone_ptr;
+	t_zone_header	*zone_ptr;
+	t_block_header	*block;
+	t_block_header	*next_top;
+	// Size alligned with PAGE_SIZE
+	// TODO: faire la logique
+	size_t			mem_got = mem_asked;
 	if (!g_malloc.is_init)
 	{
 		init_malloc();
@@ -89,4 +96,14 @@ void *allocate_block(size_t mem_asked)
 		// ERR
 		return NULL;
 	}
+	block =zone_ptr->top;
+	next_top = set_block(block, mem_got);
+	if (next_top == NULL)
+	{
+		// ERR
+		return NULL;
+	}
+	zone_ptr->top = next_top;
+	// The start of the block is just after the header
+	return block + 1;
 }

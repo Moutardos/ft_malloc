@@ -24,10 +24,12 @@ typedef enum e_zonetype
 // Header for the memory zone
 typedef struct s_zone_header
 {
-	t_zonetype			  zone_type;
-	size_t				  total_size;
-	size_t				  free_space;
-	struct s_zone_header *next;
+	t_zonetype				zone_type;
+	size_t					total_size;
+	size_t					space_used;
+	// Top of the stack, next available block
+	t_block_header			*top;
+	struct s_zone_header	*next;
 } t_zone_header;
 
 // Singleton containing information like the
@@ -41,6 +43,10 @@ typedef struct s_malloc_singleton
 
 } t_malloc_singleton;
 
-// Find a corresponding block or create a new zone of memory
-// return the adress or null if something wrong happened
-void *allocate_block(size_t mem_asked);
+// Find the correcto zone for the memory asked,
+// and return correct block at the top of the
+// memory zone
+// @return: the adress which is guaranteed to have
+// at least mem_asked of memory
+// else NULL
+void *allocate_memory(size_t mem_asked);
