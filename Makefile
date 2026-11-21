@@ -19,9 +19,13 @@ SRCS_MALLOC	:=	\
 				free.c \
 				realloc.c
 
+SRCS_VIEW	:=	\
+				show_alloc_mem.c
+
 SRCS		:=	\
 				${addprefix engine/, $(SRCS_ENGINE)} \
-				${addprefix malloc/, $(SRCS_MALLOC)}
+				${addprefix malloc/, $(SRCS_MALLOC)} \
+				${addprefix view/, $(SRCS_VIEW)}
 
 OBJ_DIR		:=	obj
 OBJS		:=	${addprefix $(OBJ_DIR)/, $(SRCS:.c=.o)}

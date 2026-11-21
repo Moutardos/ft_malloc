@@ -7,7 +7,7 @@
 // Header for the memory block
 typedef struct s_block_header
 {
-	size_t				   block_size;
+	size_t				   size;
 	int					   is_free;
 	void				  *zone_header;
 	struct s_block_header *next;

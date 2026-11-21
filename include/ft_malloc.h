@@ -15,3 +15,9 @@ void    *malloc(size_t size);
 // a new allocation and free the old one.
 // Return the pointer to the new allocated memory or NULL if error is met
 void    *realloc(void *ptr, size_t size);
+
+// Visualizer
+
+// Wrapper to show_alloc_mem_ex
+void show_alloc_mem();
+void show_alloc_mem_ex();

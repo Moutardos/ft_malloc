@@ -12,7 +12,6 @@ static int init_malloc()
 	// TODO: check when to return an error (sysconf ?)
 	return 1;
 }
-
 static t_zonetype mem_to_zonetype(size_t mem)
 {
 	if (mem < TINY_MAX_ALLOC)
@@ -89,4 +88,21 @@ void *allocate_block(size_t mem_asked)
 		// ERR
 		return NULL;
 	}
+	return NULL;
+}
+
+char *memory_zone_str(t_zonetype zone_type)
+{
+	static char *map_zone_type_str[3] = {"TINY", "SMALL", "LARGE"};
+	return map_zone_type_str[zone_type];
+}
+
+const t_zone_header *get_first_zone()
+{
+	return g_malloc.start;
+}
+
+size_t get_total_malloc()
+{
+	return g_malloc.total_malloc;
 }

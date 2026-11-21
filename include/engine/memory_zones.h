@@ -37,10 +37,17 @@ typedef struct s_malloc_singleton
 {
 	int			   is_init;
 	size_t		   page_size;
+	size_t		   total_malloc;
 	t_zone_header *start;
-
 } t_malloc_singleton;
 
 // Find a corresponding block or create a new zone of memory
 // return the adress or null if something wrong happened
 void *allocate_block(size_t mem_asked);
+
+// Return a null ended char * matching the zone type
+char *memory_zone_str(t_zonetype zone_type);
+
+// GETTTER used for view
+const t_zone_header *get_first_zone();
+size_t				 get_total_malloc();
