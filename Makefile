@@ -33,7 +33,7 @@ INCLUDE_DIR	:=	include
 BIN_DIR		:=	bin
 
 CC			:= gcc
-CFLAGS		:= -Wall -Wextra -MMD -MP -fPIC -I$(INCLUDE_DIR)
+CFLAGS		:= -Wall -Wextra -MMD -MP -fPIC -I$(INCLUDE_DIR) -I$(LIBFT)/include
 
 # RULES
 all: $(BIN_DIR)/$(NAME)
