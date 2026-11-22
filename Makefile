@@ -19,36 +19,50 @@ SRCS_MALLOC	:=	\
 				free.c \
 				realloc.c
 
+SRCS_VIEW	:=	\
+				show_alloc_mem.c
+
 SRCS		:=	\
 				${addprefix engine/, $(SRCS_ENGINE)} \
-				${addprefix malloc/, $(SRCS_MALLOC)}
+				${addprefix malloc/, $(SRCS_MALLOC)} \
+				${addprefix view/, $(SRCS_VIEW)}
 
 OBJ_DIR		:=	obj
 OBJS		:=	${addprefix $(OBJ_DIR)/, $(SRCS:.c=.o)}
 
 SRCS 		:=	${addprefix $(SRC_DIR)/, $(SRCS)}  
 
+TEST		:= malloc_test
+TEST_DIR	:= tests
+
+TEST_SRCS	:= main.c
+TEST_SRCS	:= ${addprefix $(TEST_DIR)/, $(TEST_SRCS)}
 
 INCLUDE_DIR	:=	include
 BIN_DIR		:=	bin
 
 CC			:= gcc
-CFLAGS		:= -Wall -Wextra -MMD -MP -fPIC -I$(INCLUDE_DIR) -I$(LIBFT)/include
+CFLAGS		:= -Wall -Wextra -MMD -MP -fPIC
+IFLAGS 		:= -I$(INCLUDE_DIR) -I$(LIBFT)/include
 
 # RULES
 all: $(BIN_DIR)/$(NAME)
 
+test: $(BIN_DIR)/$(TEST)
+
+$(BIN_DIR)/$(TEST): $(BIN_DIR)/$(NAME)
+	$(CC) $(IFLAGS) $(TEST_SRCS) -o $@ -L$(BIN_DIR) -lft_malloc -Wl,-rpath,$(BIN_DIR)
 $(LIBFT_A):
 	$(MAKE) -C $(LIBFT)
 
 $(BIN_DIR)/$(NAME): $(LIBFT_A) $(OBJS)
 	mkdir -p ${@D}
 	$(CC) -shared -o $@ $(OBJS) $(LIBFT_A)
-	ln -sf $(BIN_DIR)/$(NAME) $(LINKNAME)
+	ln -sf $(NAME) $(BIN_DIR)/$(LINKNAME)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p ${@D}
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(IFLAGS) -c $< -o $@
 
 
 clean:
@@ -57,7 +71,6 @@ clean:
 
 fclean: clean
 	rm -rf $(BIN_DIR)
-	rm -f $(LINKNAME)
 	$(MAKE) -C $(LIBFT) fclean
 
 re: fclean all

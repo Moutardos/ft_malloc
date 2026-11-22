@@ -1,7 +1,6 @@
 #pragma once
 
 #include "stdio.h"
-
 // Free the memory allocated in `ptr`
 void    free(void *ptr);
 
@@ -15,3 +14,4 @@ void    *malloc(size_t size);
 // a new allocation and free the old one.
 // Return the pointer to the new allocated memory or NULL if error is met
 void    *realloc(void *ptr, size_t size);
+

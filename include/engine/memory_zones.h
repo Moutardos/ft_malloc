@@ -14,7 +14,7 @@
 #define LARGE_BLOCK_THRESHOLD (SMALL_MAX_ALLOC + 1)
 // Similar to  MMAP_TRESHOLD in stdc malloc
 
-#define ALIGN_VALUE 16
+#define ALIGN_VALUE		  16
 #define DEFAULT_PAGE_SIZE 4096
 
 typedef enum e_zonetype
@@ -44,8 +44,8 @@ typedef struct s_malloc_singleton
 {
 	int			   is_init;
 	size_t		   page_size;
+	size_t		   total_malloc;
 	t_zone_header *start;
-
 } t_malloc_singleton;
 
 // Find the correct memory zone for the size asked in bytes.
@@ -53,7 +53,9 @@ typedef struct s_malloc_singleton
 // else NULL
 void *allocate_block(size_t mem_asked);
 
-// Align n with a multiple of 2.
-// Memory allocation is often aligned on 16 bytes
-// !! won't work if align is not a multiple of 2
-size_t align_up(size_t n, size_t align);
+// Return a null ended char * matching the zone type
+char *memory_zone_str(t_zonetype zone_type);
+
+// GETTTER used for view
+const t_zone_header *get_first_zone();
+size_t				 get_total_malloc();
