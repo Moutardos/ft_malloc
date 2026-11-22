@@ -24,7 +24,7 @@ static void print_zone(const t_zone_header *zone)
 	t_block_header *block = (t_block_header *)zone + 1;
 
 	print_zone_header(zone);
-	while (!block->is_free)
+	while (block->is_not_free)
 	{
 		print_block(block);
 		block = block->next;
