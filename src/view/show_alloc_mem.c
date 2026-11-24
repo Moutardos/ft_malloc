@@ -6,7 +6,7 @@
 // TINY : 0xA0000
 static void print_zone_header(const t_zone_header *zone_header)
 {
-	ft_printf("%s : %X\n", zone_header->zone_type, zone_header);
+	ft_printf("%s : %p\n", memory_zone_str(zone_header->zone_type), zone_header);
 }
 
 // OUTPUT:
@@ -21,10 +21,10 @@ static void print_block(const t_block_header *block_header)
 }
 static void print_zone(const t_zone_header *zone)
 {
-	t_block_header *block = (t_block_header *)zone + 1;
+	t_block_header *block = zone->start;
 
 	print_zone_header(zone);
-	while (block->is_not_free)
+	while (block && block->is_not_free)
 	{
 		print_block(block);
 		block = block->next;

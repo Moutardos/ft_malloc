@@ -1,6 +1,6 @@
 #include "engine/memory_block.h"
 
-t_block_header *set_block_used(t_block_header *block, size_t mem_size) 
+t_block_header *set_block(t_block_header *block, size_t mem_size) 
 {
 	if (block == NULL)
 	{

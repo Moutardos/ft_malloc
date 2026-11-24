@@ -59,50 +59,61 @@ static size_t block_max_alloc(t_zonetype zone_type)
 	}
 }
 
-// Allocate the zone memory and fill the header
-static t_zone_header *
-allocate_zone(t_zone_header **link_to, t_zonetype type, size_t requested_size)
+static t_zone_header *allocate_zone(size_t nb_block, size_t block_size)
 {
-	// The maximum a block can alloc
-	size_t block_max = align_up(block_max_alloc(type), ALIGN_VALUE);
-	// Zone size is the header + 100 allocations
-	// or the requested_size if the type is large
-	size_t zone_size = 0;
-	if (type == LARGE)
-	{
-		zone_size = align_up(sizeof(t_zone_header) +
-								 (sizeof(t_block_header) + requested_size),
-							 g_malloc.page_size);
-	}
-	else
-	{
-		zone_size = align_up(sizeof(t_zone_header) +
-								 (100 * (sizeof(t_block_header) + block_max)),
-							 g_malloc.page_size);
-	}
-	// MAP ANON -> set everything to 0
+	size_t		   zone_size;
+	t_zone_header *zone_ptr;
+	zone_size = align_up(sizeof(t_zone_header) +
+							 (nb_block * (sizeof(t_block_header) + block_size)),
+						 g_malloc.page_size);
+
 	// MAP PRIVATE -> not acessible by other process
-	t_zone_header *zone_ptr = mmap(
+	// MAP ANON -> set everything to 0
+	zone_ptr = mmap(
 		NULL, zone_size, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 
 	if (zone_ptr == MAP_FAILED)
 	{
 		return NULL;
 	}
+	zone_ptr->total_size = zone_size;
+	return zone_ptr;
+}
+
+// Allocate the zone memory and fill the header
+static t_zone_header *create_zone(t_zone_header **link_to, t_zonetype type)
+{
+	// The maximum a block can store
+	size_t block_max = align_up(block_max_alloc(type), ALIGN_VALUE);
+	size_t nb_block = 1; // The zone is either 1 big block (if LARGE), else 100
+	if (type != LARGE)
+	{
+		nb_block = 100;
+	}
 	size_t zone_hdr_aligned = align_up(sizeof(t_zone_header), ALIGN_VALUE);
-	zone_ptr->next = NULL;
+	t_zone_header *zone_ptr;
+
+	zone_ptr = allocate_zone(nb_block, block_max);
+	if (!zone_ptr)
+	{
+		// TODO: ERR
+		return NULL;
+	}
+	zone_ptr->block_size = block_max;
 	zone_ptr->zone_type = type;
-	zone_ptr->total_size = zone_size - zone_hdr_aligned;
-	zone_ptr->top = (t_block_header *)((uint8_t *)zone_ptr + zone_hdr_aligned);
+	// TODO : keep start at begining (free)
+	zone_ptr->start =
+		(t_block_header *)((uint8_t *)zone_ptr + zone_hdr_aligned);
+	zone_ptr->top = zone_ptr->start;
+	zone_ptr->next = NULL;
 	*link_to = zone_ptr;
 	return zone_ptr;
 }
 
 // TODO: see if use int for errors
 // TODO: Better organization, srp
-static t_zone_header *find_zone(size_t mem)
+static t_zone_header *find_zone(t_zonetype type)
 {
-	t_zonetype type = mem_to_zonetype(mem);
 	// link_to is the link from the previous node to the new zone if created
 	t_zone_header **link_to = &g_malloc.start;
 	t_zone_header  *zone_ptr = g_malloc.start;
@@ -121,7 +132,7 @@ static t_zone_header *find_zone(size_t mem)
 	// If the zone wasn't found, create it
 	if (zone_ptr == NULL)
 	{
-		zone_ptr = allocate_zone(link_to, type, mem);
+		zone_ptr = create_zone(link_to, type);
 	}
 	return zone_ptr;
 }
@@ -130,26 +141,23 @@ void *allocate_block(size_t mem_asked)
 {
 	t_zone_header  *zone_ptr;
 	t_block_header *block;
-	t_block_header *next_top;
-
+	t_zonetype		type = mem_to_zonetype(mem_asked);
 	if (!g_malloc.is_init)
 	{
 		init_malloc();
 	}
-	zone_ptr = find_zone(mem_asked);
+	zone_ptr = find_zone(type);
 	if (zone_ptr == NULL)
 	{
 		// ERR
 		return NULL;
 	}
 	block = zone_ptr->top;
-	next_top = set_block(block, mem_asked);
-	if (next_top == NULL)
-	{
-		// ERR
-		return NULL;
-	}
-	zone_ptr->top = next_top;
+
+	// TODO: add a error  return to set_block,
+	// curr return NULL if good
+	zone_ptr->top = set_block(block, zone_ptr->block_size);
+	g_malloc.total_malloc += zone_ptr->block_size;
 	// The start of the block is just after the header
 	return block + 1;
 }
@@ -169,4 +177,3 @@ size_t get_total_malloc()
 {
 	return g_malloc.total_malloc;
 }
-

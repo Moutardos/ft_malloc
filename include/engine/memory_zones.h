@@ -30,9 +30,11 @@ typedef enum e_zonetype
 typedef struct s_zone_header
 {
 	t_zonetype zone_type;
+	size_t	   block_size;
 	size_t	   total_size;
 	size_t	   free_space;
 	// Top of the stack, next available block
+	t_block_header		 *start;
 	t_block_header		 *top;
 	struct s_zone_header *next;
 } t_zone_header;

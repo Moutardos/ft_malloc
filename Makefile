@@ -12,8 +12,8 @@ SRC_DIR 	:=	src
 
 SRCS_ENGINE :=	\
 				memory_zones.c \
-				memory_block.c
-
+				memory_block.c \
+				memory.c
 SRCS_MALLOC	:=	\
 				malloc.c \
 				free.c \
@@ -42,7 +42,7 @@ INCLUDE_DIR	:=	include
 BIN_DIR		:=	bin
 
 CC			:= gcc
-CFLAGS		:= -Wall -Wextra -MMD -MP -fPIC
+CFLAGS		:= -Wall -Wextra -g3 -gdwarf-4 -MMD -MP -fPIC
 IFLAGS 		:= -I$(INCLUDE_DIR) -I$(LIBFT)/include
 
 # RULES
@@ -51,7 +51,7 @@ all: $(BIN_DIR)/$(NAME)
 test: $(BIN_DIR)/$(TEST)
 
 $(BIN_DIR)/$(TEST): $(BIN_DIR)/$(NAME)
-	$(CC) $(IFLAGS) $(TEST_SRCS) -o $@ -L$(BIN_DIR) -lft_malloc -Wl,-rpath,$(BIN_DIR)
+	$(CC) -g3 -gdwarf-4 $(IFLAGS) $(TEST_SRCS) -o $@ -L$(BIN_DIR) -lft_malloc -Wl,-rpath,$(BIN_DIR)
 $(LIBFT_A):
 	$(MAKE) -C $(LIBFT)
 
